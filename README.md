@@ -23,22 +23,11 @@ Framework reference: [LinkedIn — "Most engineering knowledge is never publishe
 
 ## The four skills and how they compose
 
-```
-                    ┌────────────────────────────────────────┐
-                    │             3+1 docs                   │
-                    │  Orientation · Operations · Decisions  │
-                    └──────────┬──────────────┬──────────────┘
-                               │              │
-                  grill-me ────┘              └──── graduate
-                  (write into docs)                 (move WIP → docs)
-                               │              │
-                               ▼              ▲
-                          start-work ────────►│
-                          (work the WIP layer)│
-                                              │
-                          transcript-mine ────┘
-                          (close the correction loop — feed rules back into Orientation)
-```
+<p align="center">
+  <img src="docs/skills-loop.svg" alt="Four skills — grill-me, start-work, graduate, transcript-mine — composing clockwise around a central 3+1 docs stack (Orientation, Operations, Decisions, WIP)." width="640">
+</p>
+
+Four skills, one loop, one shared substrate: a project's 3+1 docs. **`grill-me`** seeds the docs by interviewing you; **`start-work`** drives the WIP layer while you execute; **`graduate`** promotes finished WIP into permanent Operations / Decisions; **`transcript-mine`** scans past sessions for recurring corrections and feeds them back into `CONTRACT.md` / `CLAUDE.md`, so the next plan starts with a sharper agent.
 
 ### `grill-me` — interview, then route
 
@@ -66,25 +55,6 @@ This is the bridge from the transient bucket to the persistent ones. Without `gr
 Eugene Yan's *compounding-loop* practice for Claude Code. Scans recent transcripts for recurring user-correction patterns ("stop doing X", "you forgot Y", "still wrong"), surfaces the top clusters with hit counts, and proposes config updates. Operates locally on `~/.claude/projects/*/*.jsonl`; nothing leaves the machine.
 
 Without this, every correction is forgotten next session. With it, corrections compound — usually into a new `CONTRACT.md` clause or a `CLAUDE.md` line, which means the loop closes inside the 3+1 framework rather than outside it.
-
----
-
-## The loop
-
-```
-plan → grill-me → docs (Orientation + Decisions seeded)
-                    │
-                    ▼
-              start-work → WIP tracker → execute
-                    │
-                    ▼
-              graduate → Operations / Decisions updated, WIP closed
-                    │
-                    ▼
-              transcript-mine (periodic) → CONTRACT / CLAUDE.md hardened
-                    │
-                    └─► next plan starts with a sharper agent
-```
 
 Each skill writes to a layer the next one reads. Skip any of them and the loop leaks: skip `grill-me` and docs stay tacit; skip `graduate` and WIP rots; skip `transcript-mine` and the same correction repeats every session.
 
@@ -116,6 +86,8 @@ Each skill is self-contained: a `SKILL.md` (the contract Claude Code reads) plus
 claude-skills-3plus1/
 ├── README.md                    — this file
 ├── LICENSE
+├── docs/
+│   └── skills-loop.svg          — the diagram embedded in README
 └── skills/
     ├── grill-me/
     │   └── SKILL.md
