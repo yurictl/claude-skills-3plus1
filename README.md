@@ -60,6 +60,20 @@ Each skill writes to a layer the next one reads. Skip any of them and the loop l
 
 ---
 
+## From docs to graders — runnable example
+
+The four skills keep the substrate alive; the next step is making the harness **execute** it. [`examples/verification-harness/`](examples/verification-harness/) is a self-contained mini-project (clean 3+1 layout, runnable in five minutes) that wires:
+
+- a severity-tagged conventions doc as the **rubric**,
+- a `/review` skill that grades manifest diffs against it,
+- a **PreToolUse hook** that deterministically blocks `git push` until the grade is fresh — "always before X" belongs in a hook, not in a CLAUDE.md sentence,
+- a **golden set** of violations replayed through headless `claude -p` (`make replay` → catch-rate), so the grader is calibrated, not decorative,
+- a `/checkpoint` write-back step that turns session failures into new rules + fixtures.
+
+The point it demonstrates: in a mature 3+1 project the verification knowledge is already written down — what's missing is the executor. See the example's `README.md` for the demo loop.
+
+---
+
 ## Install
 
 Symlink the skills into your Claude Code skills directory:
