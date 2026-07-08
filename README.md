@@ -74,6 +74,18 @@ The point it demonstrates: in a mature 3+1 project the verification knowledge is
 
 ---
 
+## Local telemetry — runnable example
+
+The harness does the checking; [`examples/agent-telemetry/`](examples/agent-telemetry/) makes the loop **measurable**. An [agentsview](https://github.com/kenn-io/agentsview)-inspired stack at 1% of the weight — no server, no database, no dependencies:
+
+- a **zero-LLM hook collector** logs work-loop events (start-work / checkpoint / push / MR / skill invocations) to JSONL as they happen,
+- a **SessionEnd harvester** distills each transcript into one durable line (tokens deduped by message id, active time vs wall time, tool/model mix) before the ~30-day transcript rotation erases it,
+- a **stdlib report generator** renders a console summary or a self-contained static HTML dashboard (light + dark).
+
+Collection is transparent and controllable: everything is wired in one `.claude/settings.json`, collectors always exit 0 (telemetry can never block the agent), stores are local, gitignored, and disposable. `make seed && make html` shows the dashboard in under a minute with no real sessions.
+
+---
+
 ## Install
 
 Symlink the skills into your Claude Code skills directory:
