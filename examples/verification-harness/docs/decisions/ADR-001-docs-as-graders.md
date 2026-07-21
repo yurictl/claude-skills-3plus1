@@ -2,7 +2,7 @@
 title: "ADR-001: Conventions docs are executed by the harness, not read by humans at review time"
 summary: "Turn severity-tagged convention docs into machine-run graders (skill + hook + golden set) instead of relying on reviewers to apply them from memory."
 status: accepted
-updated: "02-07-2026"
+updated: "21-07-2026"
 ---
 
 # ADR-001: Conventions docs are executed by the harness, not read by humans at review time
@@ -26,3 +26,10 @@ Every convention doc that contains `[BLOCKER]`/`[WARNING]` rules is treated as *
 - The rubric doc becomes load-bearing: editing it changes gate behavior, so edits get reviewed like code. The golden set is the regression suite for such edits.
 - The grade marker is a soft artifact (a file); the harness trusts the skill to write it honestly. If that ever proves insufficient, the escalation path is running the replay script itself as the gate.
 - LLM-as-judge is used without any judge infrastructure: a headless `claude -p` call with the rubric inline is the whole judge.
+
+## Amendment (21-07-2026): anti-tamper and the CAVEAT band
+
+Two refinements, prompted by pattern convergence with an outside reconstruction of the same harness shape ([fable-method](https://github.com/Sahir619/fable-method) — cited as convergence, not as measurement):
+
+1. **The marker is now content-bound, and the gate hunts false completion.** `.claude/grade-ok` holds a fingerprint of `app/k8s/` at grade time (`scripts/grade-marker.sh`), so `touch` can't forge it and any post-grade edit invalidates it; the hook additionally blocks hand edits to the marker and blocks pushes that change the product and its calibration material (`tests/golden/`, the rubric) in the same outgoing set — the weakened-test pattern. Residual trust — "did the grade actually happen" — remains with the skill's hard rule; the escalation path above still stands.
+2. **Three reporting bands instead of two.** Justified exceptions are no longer silently accepted: they surface as `[CAVEAT]` findings — structurally clean, resting on a semantic assumption — and route to a human by design. The caveat band *names* the handoff line between harness and human that this ADR's first consequence describes.

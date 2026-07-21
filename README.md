@@ -64,13 +64,16 @@ Each skill writes to a layer the next one reads. Skip any of them and the loop l
 
 The four skills keep the substrate alive; the next step is making the harness **execute** it. [`examples/verification-harness/`](examples/verification-harness/) is a self-contained mini-project (clean 3+1 layout, runnable in five minutes) that wires:
 
-- a severity-tagged conventions doc as the **rubric**,
+- a severity-tagged conventions doc as the **rubric**, graded in three bands — `[BLOCKER]` / `[WARNING]` / `[CAVEAT]` (a justified exception surfaced for human sign-off, never silently accepted),
 - a `/review` skill that grades manifest diffs against it,
 - a **PreToolUse hook** that deterministically blocks `git push` until the grade is fresh — "always before X" belongs in a hook, not in a CLAUDE.md sentence,
+- an **anti-tamper layer** aimed at false completion: the grade marker is a content fingerprint (`touch` can't forge it), hand edits to it are blocked, and changing the product together with its tests/rubric in one push is refused as the weakened-test pattern,
 - a **golden set** of violations replayed through headless `claude -p` (`make replay` → catch-rate), so the grader is calibrated, not decorative,
 - a `/checkpoint` write-back step that turns session failures into new rules + fixtures.
 
 The point it demonstrates: in a mature 3+1 project the verification knowledge is already written down — what's missing is the executor. See the example's `README.md` for the demo loop.
+
+**Pattern convergence.** [fable-method](https://github.com/Sahir619/fable-method) — a community reconstruction of an agent-verification workflow — independently arrives at the same harness shape, and its domain-adapter triple maps one-to-one onto 3+1: **fraud-patterns** → the rubric + golden set, **evidence** (the source-of-truth probe per check) → Operations, **authority** (who signs off what the harness can't) → `CONTRACT.md`, whose ask-first gates and hard stops already are that slot. An outside effort converging on the same structure is evidence the pattern is real — cite it as convergence, not as measurement.
 
 ---
 

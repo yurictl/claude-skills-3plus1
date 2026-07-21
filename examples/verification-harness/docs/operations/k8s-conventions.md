@@ -2,14 +2,16 @@
 title: "Kubernetes Manifest Conventions"
 summary: "Severity-tagged authoring rules for everything under app/k8s/ — the rubric the /review grader executes and the golden set calibrates."
 status: active
-updated: "02-07-2026"
+updated: "21-07-2026"
 ---
 
 # Kubernetes Manifest Conventions
 
 Prescriptive rules for authoring manifests under `app/k8s/`. Apply this checklist before merging any change to those paths. This document is **executable**: the `/review` skill grades diffs against it, the pre-push hook enforces a fresh grade, and `tests/golden/` pins its catch-rate.
 
-Severity: `[BLOCKER]` must be fixed before merge; `[WARNING]` should be fixed unless justified with an inline `# reason:` comment.
+Severity: `[BLOCKER]` must be fixed before merge; `[WARNING]` should be fixed unless justified with an inline `# reason:` comment. A justified exception is not silently accepted — the grader reports it as `[CAVEAT]` with the stated reason, routing it to a human for sign-off.
+
+Evidence: every rule in this file is checked against the **manifest text itself** (the diff or file content) — no live-cluster probe is needed. The rubric's own health is checked by `make replay` (golden-set catch-rate). In a real project, note the source-of-truth probe per rule when it is anything other than the text being graded.
 
 ## Containers
 
@@ -33,6 +35,8 @@ replicas: 1  # reason: batch job runner, no traffic, restarts acceptable
 ```
 
 `[WARNING]` exceptions need only the inline comment. `[BLOCKER]` exceptions additionally require the justification in the MR/commit description — inline alone is not sufficient.
+
+Either way the exception surfaces in the grade as `[CAVEAT] <rule> — <file>:<line> — <stated reason>`: the harness verified the structure, a human owns the assumption.
 
 ## Provenance
 

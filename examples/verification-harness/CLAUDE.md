@@ -13,16 +13,18 @@ Demo project: Kubernetes manifests under `app/k8s/` guarded by a docs-driven ver
 | The grader | `/review` skill (`.claude/skills/review/`) |
 | The write-back | `/checkpoint` skill (`.claude/skills/checkpoint/`) |
 | The gate | `scripts/hooks/pre-push-grade.sh` via PreToolUse hook |
+| The trust anchor | `.claude/grade-ok` fingerprint marker, managed by `scripts/grade-marker.sh` |
 | Calibration | `tests/golden/` + `scripts/replay.sh` (`make replay`) |
 
 ## Severity model
 
-Findings are classified at exactly two levels:
+Findings are reported in exactly three bands:
 
 - `[BLOCKER]` — must not merge in this state; fix before proceeding.
 - `[WARNING]` — should be corrected; does not block if a justification is documented.
+- `[CAVEAT]` — a violation carrying a documented justification (`# reason:`). It passed the structural check but rests on a semantic assumption the harness cannot verify, so it is **surfaced for human sign-off, never silently accepted**. Caveats are the designed handoff line between the harness and the human.
 
-State the severity, the rule, the file/line, and the correct form. Do not list passing rules.
+State the severity, the rule, the file/line, and the correct form (for caveats: the stated reason). Do not list passing rules.
 
 Intentional exceptions are marked inline with `# reason: <short justification>` at the point of violation; a `[BLOCKER]` exception additionally requires the justification in the MR/commit description.
 
@@ -30,9 +32,27 @@ Intentional exceptions are marked inline with `# reason: <short justification>` 
 
 Before a non-trivial change, name the check that will tell you it's done. For manifest changes the check is always the same: `/review` reports zero `[BLOCKER]` findings. A goal without a check is a guess.
 
+**Bounded retries:** three consecutive failed attempts at the same check → stop, report what was tried and what failed, and surface to the human. Do not grind the loop.
+
 ## Gate behavior
 
-`git push` is gated by a PreToolUse hook: if `app/k8s/` changed and the grade marker (`.claude/grade-ok`) is missing or stale, the push is blocked with instructions. Run `/review`; it writes the marker only on a clean grade. Do not touch the marker by hand — that defeats the harness this example exists to demonstrate.
+`git push` is gated by a PreToolUse hook with three checks:
+
+1. **Marker integrity** — `.claude/grade-ok` is written only by `scripts/grade-marker.sh stamp`, invoked by `/review` after a clean grade. Any other Bash command touching the marker is blocked by the hook — there is nothing legitimate to do to it by hand.
+2. **Weakened-test gate** — a push that changes `app/k8s/` and the calibration material (`tests/golden/`, the rubric) in the same outgoing set is blocked: changing the product and weakening its tests in one go is the false-completion pattern this harness exists to catch. Land calibration changes separately, via `/checkpoint` + `make replay`.
+3. **Grade freshness** — the marker holds a content fingerprint of `app/k8s/` at grade time, not a timestamp. If the current state doesn't match, the grade is stale; re-run `/review`.
+
+Residual trust: the fingerprint proves the graded state is the pushed state, but cannot prove the grade *happened* — that is `/review`'s hard rule, and the escalation path if it ever proves insufficient is running the replay itself as the gate (see ADR-001).
+
+## Adapter — evidence · authority · fraud-patterns
+
+The three slots a verification harness needs, made explicit (in a real project this table is the domain adapter):
+
+| Slot | Meaning | Here |
+|---|---|---|
+| **Evidence** | the source of truth each check reads | manifest text via `git diff` / file content; calibration via `make replay` catch-rate |
+| **Authority** | who may sign off what the harness can't | `[CAVEAT]` findings and `[BLOCKER]` exceptions → human, via MR description; irreversible operations → human, always |
+| **Fraud-patterns** | the failure modes checked for | the rubric rules + `tests/golden/` fixtures; the weakened-test gate in the hook |
 
 ## Write-back rule
 

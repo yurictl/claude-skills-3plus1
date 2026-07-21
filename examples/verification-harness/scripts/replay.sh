@@ -10,6 +10,17 @@ cd "$(dirname "$0")/.." || exit 1
 RUBRIC="docs/operations/k8s-conventions.md"
 [ -f "$RUBRIC" ] || { echo "missing $RUBRIC" >&2; exit 1; }
 
+# Tamper disclosure: a catch-rate computed against uncommitted fixtures or an
+# uncommitted rubric is not comparable to the committed baseline — say so up
+# front, so a claimed "N/N" always carries the caveat.
+dirty=$(git status --porcelain -- tests/golden "$RUBRIC" 2>/dev/null)
+if [ -n "$dirty" ]; then
+  echo "NOTE: uncommitted changes to calibration material — this catch-rate is"
+  echo "provisional, not the committed baseline:"
+  echo "$dirty" | sed 's/^/  /'
+  echo
+fi
+
 pass=0
 miss=0
 
@@ -17,7 +28,7 @@ for dir in tests/golden/*/; do
   name=$(basename "$dir")
   [ -f "$dir/case.yaml" ] && [ -f "$dir/expected.txt" ] || { echo "SKIP  $name (incomplete fixture)"; continue; }
 
-  prompt="You are a Kubernetes manifest reviewer. Grade the manifest below against the following conventions. Report findings only, one per line, in the format: [SEVERITY] rule — detail. Do not list passing rules.
+  prompt="You are a Kubernetes manifest reviewer. Grade the manifest below against the following conventions. Report findings only, one per line, in the format: [SEVERITY] rule — detail. A violation carrying an inline '# reason:' justification is not silently accepted: report it as [CAVEAT] rule — detail — stated reason. Do not list passing rules.
 
 === CONVENTIONS ===
 $(cat "$RUBRIC")
