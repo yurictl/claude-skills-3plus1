@@ -1,4 +1,5 @@
 .DS_Store
+.gitmark/
 __pycache__/
 *.pyc
 .venv/

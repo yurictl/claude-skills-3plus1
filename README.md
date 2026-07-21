@@ -60,6 +60,12 @@ Without this, every correction is forgotten next session. With it, corrections c
 
 Each skill writes to a layer the next one reads. Skip any of them and the loop leaks: skip `grill-me` and docs stay tacit; skip `graduate` and WIP rots; skip `transcript-mine` and the same correction repeats every session.
 
+### `kb-search` — the retrieval layer (vendored)
+
+The four skills above keep the docs *written*; `kb-search` keeps them *findable* once the tree outgrows what `CLAUDE.md` and README indexes can carry. A single-file, stdlib-only Python CLI (`gitmark.py`) builds an SQLite FTS5 index over the project's markdown — bm25 ranking plus trigram/fuzzy matching (substrings, typos, Cyrillic) — and answers `where is X documented` with `file:line · heading · snippet` instead of a `grep` fan-out. Also renders a self-contained HTML tree + graph of the KB. The index lives in `.gitmark/` (gitignored, derived, disposable); markdown stays the source of truth.
+
+Vendored unchanged from [vakovalskii/ontoship](https://github.com/vakovalskii/ontoship) (MIT), which converges on the same substrate bet — markdown + README index + git, agents as first-class users — from the retrieval side. Ontoship supplies the search half; 3+1 supplies the lifecycle half (WIP → `graduate`, `CONTRACT.md`, transcript-mine). They compose without modification.
+
 ---
 
 ## From docs to graders — runnable example
@@ -103,6 +109,7 @@ ln -s "$(pwd)/skills/grill-me"        ~/.claude/skills/grill-me
 ln -s "$(pwd)/skills/start-work"      ~/.claude/skills/start-work
 ln -s "$(pwd)/skills/graduate"        ~/.claude/skills/graduate
 ln -s "$(pwd)/skills/transcript-mine" ~/.claude/skills/transcript-mine
+ln -s "$(pwd)/skills/kb-search"       ~/.claude/skills/kb-search
 ```
 
 Or copy if you prefer to detach from upstream.
@@ -127,10 +134,14 @@ claude-skills-3plus1/
     │   └── references/          — per-phase protocols
     ├── graduate/
     │   └── SKILL.md
-    └── transcript-mine/
+    ├── transcript-mine/
+    │   ├── SKILL.md
+    │   ├── references/          — pattern interpretation, rule placement
+    │   └── scripts/             — mine_transcripts.py + default patterns
+    └── kb-search/
         ├── SKILL.md
-        ├── references/          — pattern interpretation, rule placement
-        └── scripts/             — mine_transcripts.py + default patterns
+        ├── LICENSE.upstream     — MIT, vakovalskii/ontoship
+        └── scripts/             — gitmark.py (vendored, unmodified)
 ```
 
 ---
@@ -142,4 +153,5 @@ Personal. Lightly polished for sharing, not productised. Conventions evolve in l
 Origin credits:
 - `grill-me` — adapted from Matt Pocock's `grill-with-docs`.
 - `transcript-mine` — implements Eugene Yan's *closing-the-loop* step from *How to Work and Compound with AI* (2026-05).
+- `kb-search` — `gitmark.py` vendored unmodified from Valera Kovalskii's [ontoship](https://github.com/vakovalskii/ontoship) (MIT).
 - 3+1 framework — mine, written up at the LinkedIn link above.
