@@ -1,5 +1,7 @@
 # claude-skills-3plus1
 
+> **Successor: [`claude-3plus1-harness`](https://github.com/yurictl/claude-3plus1-harness)** — everything here, reworked into a clone-and-go project template: the 3+1 docs skeleton, the verification harness (generic, config-driven), local telemetry, and all six skills pre-wired. Starting a new project? Use the template. This repo stays as the skills collection and the worked examples it grew from.
+
 Personal [Claude Code](https://claude.com/claude-code) skills built around the **3+1 documentation framework**.
 
 The premise: most engineering knowledge is never published, because the act of writing it up is too expensive. If documentation lives in a shape that *both* humans and agents can read, write, and keep current, that cost collapses. These four skills are the operational loop I use to make that real.
