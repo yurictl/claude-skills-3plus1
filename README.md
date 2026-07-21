@@ -64,7 +64,7 @@ Each skill writes to a layer the next one reads. Skip any of them and the loop l
 
 The four skills above keep the docs *written*; `kb-search` keeps them *findable* once the tree outgrows what `CLAUDE.md` and README indexes can carry. A single-file, stdlib-only Python CLI (`gitmark.py`) builds an SQLite FTS5 index over the project's markdown — bm25 ranking plus trigram/fuzzy matching (substrings, typos, Cyrillic) — and answers `where is X documented` with `file:line · heading · snippet` instead of a `grep` fan-out. Also renders a self-contained HTML tree + graph of the KB. The index lives in `.gitmark/` (gitignored, derived, disposable); markdown stays the source of truth.
 
-Vendored unchanged from [vakovalskii/ontoship](https://github.com/vakovalskii/ontoship) (MIT), which converges on the same substrate bet — markdown + README index + git, agents as first-class users — from the retrieval side. Ontoship supplies the search half; 3+1 supplies the lifecycle half (WIP → `graduate`, `CONTRACT.md`, transcript-mine). They compose without modification.
+Vendored from [vakovalskii/ontoship](https://github.com/vakovalskii/ontoship) (MIT; local delta: `.worktrees` added to the index excludes), which converges on the same substrate bet — markdown + README index + git, agents as first-class users — from the retrieval side. Ontoship supplies the search half; 3+1 supplies the lifecycle half (WIP → `graduate`, `CONTRACT.md`, transcript-mine). They compose without modification.
 
 ---
 
@@ -141,7 +141,7 @@ claude-skills-3plus1/
     └── kb-search/
         ├── SKILL.md
         ├── LICENSE.upstream     — MIT, vakovalskii/ontoship
-        └── scripts/             — gitmark.py (vendored, unmodified)
+        └── scripts/             — gitmark.py (vendored; delta: .worktrees excluded)
 ```
 
 ---
@@ -153,5 +153,5 @@ Personal. Lightly polished for sharing, not productised. Conventions evolve in l
 Origin credits:
 - `grill-me` — adapted from Matt Pocock's `grill-with-docs`.
 - `transcript-mine` — implements Eugene Yan's *closing-the-loop* step from *How to Work and Compound with AI* (2026-05).
-- `kb-search` — `gitmark.py` vendored unmodified from Valera Kovalskii's [ontoship](https://github.com/vakovalskii/ontoship) (MIT).
+- `kb-search` — `gitmark.py` vendored from Valera Kovalskii's [ontoship](https://github.com/vakovalskii/ontoship) (MIT); one-line local delta documented in the skill.
 - 3+1 framework — mine, written up at the LinkedIn link above.

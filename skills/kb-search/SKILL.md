@@ -56,7 +56,9 @@ $G version
 ## Origin
 
 Vendored from [vakovalskii/ontoship](https://github.com/vakovalskii/ontoship)
-(`skills/kb-search/gitmark.py`, MIT — see `LICENSE.upstream`). Ontoship converges
+(`skills/kb-search/gitmark.py`, MIT — see `LICENSE.upstream`). Local delta from
+upstream: `.worktrees` added to `EXCLUDE_DIRS` so worktree copies don't produce
+duplicate hits. Ontoship converges
 on the same substrate bet — "a project knowledge base is just markdown + a README
 index + git" — from the retrieval side; this skill plugs its search layer into the
 3+1 loop unchanged.
